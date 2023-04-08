@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import fasttext
+import pickle
 from tqdm import tqdm
 from tqdm.keras import TqdmCallback
 import time
@@ -129,7 +130,7 @@ def train_model(X_train, y_train):
     #si está evolucionando o ha fallado o qué
     global fit_count,total_fits 
     fit_count = 0
-    total_fits = 10000 
+    total_fits = 901 
     total_folds = 5
     callback = TqdmCustomCallback(total_folds=total_folds)
 
@@ -145,22 +146,23 @@ def train_model(X_train, y_train):
 
     # Set the hyperparameters to search
     param_grid = [
-        {
-            'clf': [LogisticRegression(solver='liblinear', max_iter=10000)],
-            'clf__C': np.logspace(-6, 1, 30),
-             'clf__tol': [1e-4, 1e-3, 1e-2],  # Added tolerance values
+
+          {
+            'clf': [LogisticRegression(solver='liblinear', max_iter=10000)],  # Increased the number of iterations
+            'clf__C': np.logspace(-6, 1, 30),  # Extended the range of C values
             'clf__penalty': ['l1', 'l2']
         },
+        
         {
             'clf': [RandomForestClassifier()],
-            'clf__n_estimators': [10, 50, 100, 200],
+            'clf__n_estimators': [5, 10, 50, 100],
             'clf__max_depth': [None, 10, 20],
             'clf__min_samples_split': [2, 5],
             'clf__min_samples_leaf': [1, 2]
         },
         {
             'clf': [GradientBoostingClassifier()],
-            'clf__n_estimators': [10, 50, 100, 200],
+            'clf__n_estimators': [10, 30,50],
             'clf__learning_rate': [0.001, 0.01, 0.1, 1],
             'clf__max_depth': [None, 10, 20, 30],
             'clf__min_samples_split': [2, 5, 10],
@@ -168,13 +170,31 @@ def train_model(X_train, y_train):
         }
     ]
     
-    
-    grid_search = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(5), scoring=make_scorer(progress_scorer), verbose=3)
-    grid_search.fit(X_train, y_train)
-    callback.close()
+     # Check if the best parameters file exists
+    best_params_file = "best_params.pkl"
+    if os.path.exists(best_params_file):
+        # Load the best parameters from the file
+        with open(best_params_file, "rb") as f:
+            best_params = pickle.load(f)
+        # Set the best parameters to the pipeline
+        pipe.set_params(**best_params)
+        pipe.fit(X_train, y_train)
+    else:
+        # Perform the grid search
+        grid_search = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(5), scoring=make_scorer(progress_scorer), verbose=3)
+        grid_search.fit(X_train, y_train)
+        callback.close()
 
+        # Save the best parameters to a file
+        best_params = grid_search.best_params_
+        with open(best_params_file, "wb") as f:
+            pickle.dump(best_params, f)
 
-    return grid_search.best_estimator_
+        # Set the best parameters to the pipeline
+        pipe.set_params(**best_params)
+        pipe.fit(X_train, y_train)
+
+    return pipe
 
 def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
