@@ -1,0 +1,7 @@
+pandas
+numpy
+scikit-learn
+joblib
+fasttext
+pybind11
+wheel
