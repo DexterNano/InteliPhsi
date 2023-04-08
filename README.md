@@ -16,3 +16,9 @@ Mas tarde implemetaré pruebas pero solo cuando suba la preciosion a mas de 80% 
 
 
 El 0 son lo bueno que es detectando falsos y el 1 positivos, como ves está chungo
+
+
+
+ToDos:
+
+Tengo que terminar de cambiar explicaciones y comentarios a español
