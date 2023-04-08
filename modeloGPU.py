@@ -148,8 +148,9 @@ def train_model(X_train, y_train):
     param_grid = [
 
           {
-            'clf': [LogisticRegression(solver='liblinear', max_iter=10000)],  # Increased the number of iterations
-            'clf__C': np.logspace(-6, 1, 30),  # Extended the range of C values
+           'clf': [LogisticRegression(solver='liblinear', max_iter=10000)],
+            'clf__C': np.logspace(-6, 1, 30),
+            'clf__tol': [1e-4, 1e-3, 1e-2],  # Added tolerance values
             'clf__penalty': ['l1', 'l2']
         },
         
