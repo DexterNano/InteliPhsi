@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import fasttext
+from tqdm import tqdm
+import time
 import os
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -11,6 +13,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from joblib import dump, load
 import datetime
+
 
 # Load the dataset from a CSV file
 def load_data(file_path):
@@ -27,7 +30,7 @@ def preprocess_data(data):
     """
 
      # Load the FastText pre-trained models
-    ft_eng = fasttext.load_model('cc.en.300.bin')
+    ft_eng = fasttext.load_model('cc1.en.300.bin')
     ft_esp = fasttext.load_model('cc.es.300.bin')
     def domain_to_vector(domain):
         tokens = tokenize(domain)
