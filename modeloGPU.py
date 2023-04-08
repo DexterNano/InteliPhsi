@@ -182,7 +182,7 @@ def train_model(X_train, y_train):
         pipe.fit(X_train, y_train)
     else:
         # Perform the grid search
-        grid_search = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(5), scoring=make_scorer(progress_scorer), verbose=3)
+        grid_search = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(5), scoring=make_scorer(progress_scorer), verbose=3, n_jobs=-1)
         grid_search.fit(X_train, y_train)
         callback.close()
 
