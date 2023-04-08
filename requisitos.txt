@@ -5,3 +5,8 @@ joblib
 fasttext
 pybind11
 wheel
+tensorflow
+tqdm
+nlp 
+sentence-transformers
+nltk
